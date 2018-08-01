@@ -22,7 +22,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('manga','MangaController@index');        // Display all
 
 Route::get('manga/{id}','MangaController@show');        // Display one
-Route::get('manga/{id}/chap', 'MangaController@indexChap');
+Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display all chap of manga
+Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 
 Route::post('manga/upload', 'MangaController@store') ;   // upload new manga
 

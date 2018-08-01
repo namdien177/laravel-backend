@@ -74,6 +74,10 @@ class MangaController extends Controller
 		return MangaTagResource::collection($tags);
 	}
 
+	public function showChap($id, $idChap){
+    	return 'haha';
+	}
+
     /**
      * Show the form for editing the specified resource.
      *
