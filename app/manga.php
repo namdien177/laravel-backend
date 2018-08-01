@@ -9,7 +9,7 @@ class manga extends Model
     protected $table = 'mangas';
 
     public function manga_alias(){
-    	return $this->hasMany('App\manga_alias');
+    	return $this->hasMany('App\manga_alias','id','idManga');
     }
 
     public function bookmark(){

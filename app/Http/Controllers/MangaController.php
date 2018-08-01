@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use App\Http\Resources\MangaTags;
 use App\manga;
 use App\Http\Resources\Manga as MangaResource;
 use App\Http\Resources\MangaTags as MangaTagResource;
+use App\manga_chap;
 use App\manga_tags;
 use App\tags;
 use Illuminate\Http\Request;
@@ -20,8 +22,15 @@ class MangaController extends Controller
     public function index()
     {
         //get manga
-	    $mangas = Manga::orderBy('name','asc')->paginate(1);
+	    $mangas = Manga::orderBy('name','asc')->paginate(10);
 	    return MangaResource::collection($mangas);
+    }
+
+    public function indexChap($id){
+    	$chap = manga_chap::whereHas('manga',function ($query) use ($id){
+		    $query->where('id','=',$id);
+	    })->orderBy('chap','asc')->paginate(75);
+    	return MangaTags::collection($chap);
     }
 
     /**

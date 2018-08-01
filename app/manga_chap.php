@@ -8,6 +8,6 @@ class manga_chap extends Model
 {
     protected $table = 'manga_chaps';
     public function manga(){
-    	return $this ->belongsTo('App\manga');
+    	return $this ->belongsTo('App\manga','idManga','id');
     }
 }
