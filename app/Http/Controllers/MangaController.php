@@ -8,6 +8,7 @@ use App\manga;
 use App\Http\Resources\Manga as MangaResource;
 use App\Http\Resources\MangaTags as MangaTagResource;
 use App\manga_chap;
+use App\manga_chap_img;
 use App\manga_tags;
 use App\tags;
 use Illuminate\Http\Request;
@@ -75,7 +76,10 @@ class MangaController extends Controller
 	}
 
 	public function showChap($id, $idChap){
-    	return 'haha';
+		$img = manga_chap_img::whereHas('manga_chap',function ($query) use ($id){
+			$query->where('idManga','=',$id);
+		})->where('idChap','=',$idChap)->orderBy('id','asc')->get();
+		return MangaTags::collection($img);
 	}
 
     /**

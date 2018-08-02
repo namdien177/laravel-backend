@@ -34,7 +34,8 @@ Route::get('tags/{id}','TagsController@show');        // Display tags
 /////////////////////////LOGIN API////////////////////////////////////
 Route::group([
 
-	'middleware' => 'api'
+	'middleware' => 'api',
+    'prefix' => 'auth'
 
 ], function ($router) {
 

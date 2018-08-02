@@ -10,4 +10,8 @@ class manga_chap extends Model
     public function manga(){
     	return $this ->belongsTo('App\manga','idManga','id');
     }
+
+    public function manga_chap_img(){
+    	return $this->hasMany('App\manga_chap_img','id','idChap');
+    }
 }
