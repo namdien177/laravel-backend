@@ -9,10 +9,10 @@ class author extends Model
     protected $table = 'authors';
 
     public function manga_author(){
-    	return $this->hasMany('App\manga_author');
+    	return $this->hasMany('App\manga_author','idAuthor','id');
     }
 
     public function user(){
-    	return $this->hasOne('App\User','idViewer');
+    	return $this->hasOne('App\User','idViewer','id');
     }
 }

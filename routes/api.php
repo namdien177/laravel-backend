@@ -22,6 +22,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('manga','MangaController@index');        // Display all
 
 Route::get('manga/{id}','MangaController@show');        // Display one
+Route::get('manga/{id}/getauthor', 'MangaController@indexAuthor');   // get author
 Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display all chap of manga
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 
