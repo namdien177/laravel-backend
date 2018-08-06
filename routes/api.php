@@ -47,3 +47,5 @@ Route::group([
 	Route::post('signupauthor','AuthController@signupAuthor');
 	Route::post('signupviewer','AuthController@signupViewer');
 });
+
+Route::get('/user/{id}', 'UserController@show');

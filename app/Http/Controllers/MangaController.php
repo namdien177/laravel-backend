@@ -25,7 +25,7 @@ class MangaController extends Controller
     public function index()
     {
         //get manga
-	    $mangas = Manga::orderBy('name','asc')->paginate(1);
+	    $mangas = Manga::orderBy('name','asc')->paginate(10);
 	    return MangaResource::collection($mangas);
     }
 
