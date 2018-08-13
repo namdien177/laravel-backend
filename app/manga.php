@@ -21,7 +21,7 @@ class manga extends Model
     }
 
     public function manga_chap(){
-    	return $this->hasMany('App\manga_chap','id','idManga');
+    	return $this->hasMany('App\manga_chap','idManga','id');
     }
 
     public function manga_tag(){
