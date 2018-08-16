@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\bookmark;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResources;
+use App\Http\Resources\Manga as MangaResource;
 
 class UserController extends Controller
 {
@@ -49,6 +51,13 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         return new UserResources($user);
+    }
+
+    public function showBookmark($id){
+    	$bookmarklist = bookmark::whereHas('User', function ($query) use ($id){
+		    $query->where('id','=',$id);
+	    })->orderBy('read','asc')->get();
+    	return MangaResource::collection($bookmarklist);
     }
 
     /**

@@ -45,12 +45,12 @@ class MangaController extends Controller
 
 	/**
 	 * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-	 * 
+	 *
 	 */
-	public function getUpdateManga(){
+	public function getUpdateManga($number){
     	$listManga = manga::whereHas('manga_chap', function ($query) {
     		$query->orderBy('updated_at','asc');
-	    })->get();
+	    })->paginate($number);
     	return MangaResource::collection($listManga);
 	}
 

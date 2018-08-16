@@ -20,7 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 //////////////////Manga API//////////////////////////////////////////
 Route::get('manga','MangaController@index');        // Display all
-Route::get('manga/updatelist', 'MangaController@getupdatemanga');
+Route::get('manga/updatelist/{number}', 'MangaController@getupdatemanga');
 Route::post('manga/upload', 'MangaController@store') ;   // upload new manga
 
 Route::get('manga/{id}','MangaController@show');        // Display one
@@ -29,6 +29,7 @@ Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display all chap 
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 
 Route::get('manga/{id}/tags','MangaController@showTags');        // Display tags
+Route::get('manga/bookmark/{$id}', 'UserController@showBookmark');    // get bookmark list
 
 Route::get('tags/{id}','TagsController@show');        // Display tags
 
@@ -49,3 +50,4 @@ Route::group([
 });
 
 Route::get('/user/{id}', 'UserController@show');
+Route::get('/user/{id}/bookmark', 'UserController@showBookmark');    // get bookmark list

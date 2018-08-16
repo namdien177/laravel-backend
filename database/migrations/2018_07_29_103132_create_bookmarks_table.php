@@ -17,6 +17,7 @@ class CreateBookmarksTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('idUser');
             $table->unsignedInteger('idManga');
+	        $table->unsignedInteger('read');
             $table->timestamps();
 
 //            $table->primary(['id','idUser','idManga']);
