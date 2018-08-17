@@ -4,6 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static where(string $string, string $string1, $idUser)
+ */
 class bookmark extends Model
 {
     protected $table = 'bookmarks';

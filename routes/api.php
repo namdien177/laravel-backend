@@ -29,7 +29,10 @@ Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display all chap 
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 
 Route::get('manga/{id}/tags','MangaController@showTags');        // Display tags
-Route::get('manga/bookmark/{$id}', 'UserController@showBookmark');    // get bookmark list
+Route::get('manga/{id}/bookmark/{idUser}', 'MangaController@bookmarkManga');    // add to bookmark
+Route::get('manga/{id}/unbookmark/{idUser}', 'MangaController@unbookmarkManga');    // add to bookmark
+Route::get('manga/{id}/read/{idUser}','MangaController@markRead');
+Route::get('manga/{id}/unread/{idUser}','MangaController@markunRead');
 
 Route::get('tags/{id}','TagsController@show');        // Display tags
 
