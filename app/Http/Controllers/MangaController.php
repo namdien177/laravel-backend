@@ -238,6 +238,19 @@ class MangaController extends Controller
 		return MangaTags::collection($img);
 	}
 
+	public function getmorechap($id, $chap){
+    	$prev = manga_chap::where('idManga', '=', $id)->where('chap', '=', $chap-1)->firstOrFail();
+		$next = manga_chap::where('idManga', '=', $id)->where('chap', '=', $chap+1)->firstOrFail();
+		$linkPrev = null;
+		$linkNext = null;
+		if ($prev) $linkPrev = url('manga/'.$id.'/chap/'.$prev->chap);
+		if ($next) $linkNext = url('manga/'.$id.'/chap/'.$next->chap);
+		return response()->json([
+			'prev'=> $linkPrev,
+			'next'=> $linkNext,
+		]);
+	}
+
     /**
      * Show the form for editing the specified resource.
      *
