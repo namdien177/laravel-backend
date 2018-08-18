@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+///////////////////Author API////////////////////////////////////////
+Route::get('author', 'AuthorController@index');
+
 
 //////////////////Manga API//////////////////////////////////////////
 Route::get('manga','MangaController@index');        // Display all
@@ -55,5 +58,4 @@ Route::group([
 	Route::post('signupviewer','AuthController@signupViewer');
 });
 
-Route::get('/user/{id}', 'UserController@show');
 Route::get('/user/{id}/bookmark', 'UserController@showBookmark');    // get bookmark list
