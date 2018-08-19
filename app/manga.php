@@ -9,15 +9,15 @@ class manga extends Model
     protected $table = 'mangas';
 
     public function manga_alias(){
-    	return $this->hasMany('App\manga_alias','id','idManga');
+    	return $this->hasMany('App\manga_alias','idManga','id');
     }
 
     public function bookmark(){
-    	return $this->hasMany('App\bookmark','id','idManga');
+    	return $this->hasMany('App\bookmark','idManga','id');
     }
 
     public function manga_author(){
-    	return $this->hasMany('App\manga_author','id','idManga');
+    	return $this->hasMany('App\manga_author','idManga','id');
     }
 
     public function manga_chap(){
@@ -25,10 +25,10 @@ class manga extends Model
     }
 
     public function manga_tag(){
-    	return $this->hasMany('App\manga_tags','id','idManga');
+    	return $this->hasMany('App\manga_tags','idManga','id');
     }
 
     public function user_mang_chap(){
-    	return $this->hasMany('App\user_manga_chap','id','idManga');
+    	return $this->hasMany('App\user_manga_chap','idManga','id');
     }
 }

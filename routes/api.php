@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 ///////////////////Author API////////////////////////////////////////
 Route::get('author', 'AuthorController@index');
-
+Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 
 //////////////////Manga API//////////////////////////////////////////
 Route::get('manga','MangaController@index');        // Display all
