@@ -14,6 +14,8 @@ use App\manga_chap;
 use App\manga_chap_img;
 use App\manga_tags;
 use App\tags;
+use App\User;
+use App\viewcount;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Contracts\Providers\Auth;
 
@@ -42,6 +44,13 @@ class MangaController extends Controller
     	return MangaResource::collection($chap);
     }
 
+//	public function indexChapAll($id){
+//		$chap = manga_chap::whereHas('manga',function ($query) use ($id){
+//			$query->where('id','=',$id);
+//		})->orderBy('chap','asc')->get();
+//		return MangaResource::collection($chap);
+//	}
+
 	/**
 	 * get author of the manga
 	 * @param $id
@@ -52,6 +61,89 @@ class MangaController extends Controller
 		    $query->where('idManga','=',$id);
 	    })->orderBy('name','asc')->get();
     	return MangaResource::collection($author);
+	}
+
+	public function addCountView($id, $idChap, $idViewer){
+		$ipUser = \Request::ip();
+		if ($idViewer ==6 ){
+			$onserver = viewcount::where('idManga','=',$id)->where('idViewer','=',$idViewer)
+				->where('idChap','=',$idChap)->count();
+			if ($onserver > 0){
+				$view = viewcount::where('idManga','=',$id)->where('idViewer','=',$idViewer)
+					->where('idChap','=',$idChap)->first();
+				if ($view->IPUser != $ipUser){
+					$anonymous = new viewcount;
+					$anonymous->idManga = $id;
+					$anonymous->idViewer = $idViewer;
+					$anonymous->idChap = $idChap;
+					$anonymous->IPUser = $ipUser;
+					$anonymous->save();
+					return response()->json([
+						'boolean'=>true,
+						'message'=>'The view was counted for guess with IP: '.$ipUser,
+					]);
+				}
+				return response()->json([
+					'boolean'=>false,
+					'message'=>'The view was not counted for guess with IP: '.$ipUser,
+				]);
+			}else{
+				$anonymous = new viewcount;
+				$anonymous->idManga = $id;
+				$anonymous->idViewer = $idViewer;
+				$anonymous->idChap = $idChap;
+				$anonymous->IPUser = $ipUser;
+				$anonymous->save();
+				return response()->json([
+					'boolean'=>true,
+					'message'=>'The view was counted for guess with IP: '.$ipUser,
+				]);
+			}
+		}else{
+			$view = viewcount::where('idManga','=',$id)->where('idViewer','=',$idViewer)
+				->where('idChap','=',$idChap)->count();
+			if ($view<=0){
+				$viewcount = new viewcount;
+				$viewcount->idManga = $id;
+				$viewcount->idViewer = $idViewer;
+				$viewcount->idChap = $idChap;
+				$viewcount->IPUser = $ipUser;
+				$viewcount->save();
+				return response()->json([
+					'boolean'=>true,
+					'message'=>'The view was counted for user ID:'.$idViewer." - With IP: ".$ipUser,
+				]);
+			}
+		}
+		return response()->json([
+			'boolean'=>false,
+			'message'=>'The view was not counted for guess with IP: '.$ipUser,
+		]);
+	}
+
+	public function getViewCount($id, $idChap){
+		$viewCount = viewcount::where('idManga','=',$id)->where('idChap','=',$idChap)->count();
+		return $viewCount;
+	}
+
+	public function getViewCountAll($id){
+		$viewCount = viewcount::where('idManga','=',$id)->count();
+		return $viewCount;
+	}
+
+	public function getHottestManga($number = 4){
+		$listManga = manga::withCount('viewcount')->orderBy('viewcount_count','desc')->paginate($number);
+//		$listManga = manga::with('viewcount')->paginate($number)->sortBy(function($manga){
+//			return $manga->viewcount->count();
+//		}, SORT_REGULAR, true );
+		return MangaResource::collection($listManga);
+	}
+
+	public function getHottestMangaAuthor($number = 4, $id){
+		$listManga = manga::whereHas('manga_author', function ($query) use ($id){
+			$query->where('idAuthor','=',$id);
+		})->withCount('viewcount')->orderBy('viewcount_count','desc')->paginate($number);
+		return MangaResource::collection($listManga);
 	}
 
 	/**

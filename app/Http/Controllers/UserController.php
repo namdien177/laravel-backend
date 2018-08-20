@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResources;
 use App\Http\Resources\Manga as MangaResource;
 
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+
 class UserController extends Controller
 {
     /**
@@ -29,6 +32,22 @@ class UserController extends Controller
     {
         //
     }
+
+    public function anonymousToken(){
+	    return  response()->json([
+		    'anonymous_token' => "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2Fub255bW91cyIsImlhdCI6MTUzNDc4MDUyMywiZXhwIjoxNTM0ODQ1MzIzLCJuYmYiOjE1MzQ3ODA1MjMsImp0aSI6InhFRUR4b2RFMGpiTGp6b0UiLCJzdWIiOiI2Iiwic3JlIjoiQW5vbnltb3VzIn0.cLiyqKt7OgE8vMUuqJrvf8sE-292DkpS_1ZEsSXh8Ic"
+	    ]);
+    }
+
+//	function generateRandomString($length = 10) {
+//		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//		$charactersLength = strlen($characters);
+//		$randomString = '';
+//		for ($i = 0; $i < $length; $i++) {
+//			$randomString .= $characters[rand(0, $charactersLength - 1)];
+//		}
+//		return $randomString;
+//	}
 
     /**
      * Store a newly created resource in storage.

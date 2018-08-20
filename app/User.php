@@ -65,6 +65,10 @@ class User extends Authenticatable implements JWTSubject
 		return $this->hasMany('App\user_manga_chap');
 	}
 
+	public function viewcount(){
+		return $this->hasMany('App\viewcount','idViewer','id');
+	}
+
 	/**
 	 * Get the identifier that will be stored in the subject claim of the JWT.
 	 *

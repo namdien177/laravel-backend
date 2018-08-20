@@ -26,13 +26,17 @@ Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 Route::get('manga','MangaController@index');        // Display all
 Route::get('manga/updatelist/{number}', 'MangaController@getupdatemanga');
 Route::post('manga/upload', 'MangaController@store') ;   // upload new manga
+Route::get('manga/hottest/{number}','MangaController@getHottestManga');
+Route::get('manga/hottest/{number}/author/{id}','MangaController@getHottestMangaAuthor');
 
 Route::get('manga/{id}','MangaController@show');        // Display one
 Route::get('manga/{id}/getauthor', 'MangaController@indexAuthor');   // get author
-
-Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display all chap of manga
+Route::get('manga/{id}/getview', 'MangaController@getViewCountAll'); // display total view
+Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display 75 chap of manga
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 Route::get('manga/{id}/chap/{idChap}/link', 'MangaController@getmorelinkChap');
+Route::get('manga/{id}/chap/{idChap}/count/getcount', 'MangaController@getViewCount');
+Route::get('manga/{id}/chap/{idChap}/count/{idViewer}', 'MangaController@addCountView');
 
 Route::get('manga/{id}/tags','MangaController@showTags');        // Display tags
 
@@ -61,4 +65,5 @@ Route::group([
 
 });
 
-Route::get('/user/{id}/bookmark', 'UserController@showBookmark');    // get bookmark list
+Route::get('user/{id}/bookmark', 'UserController@showBookmark');    // get bookmark list
+Route::post('/anonymous','UserController@anonymousToken');      //record anonymous user

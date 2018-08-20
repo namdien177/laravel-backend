@@ -31,4 +31,8 @@ class manga extends Model
     public function user_mang_chap(){
     	return $this->hasMany('App\user_manga_chap','idManga','id');
     }
+
+    public function viewcount(){
+    	return $this->hasMany('App\viewcount','idManga','id');
+    }
 }

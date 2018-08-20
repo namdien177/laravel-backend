@@ -14,4 +14,8 @@ class manga_chap extends Model
     public function manga_chap_img(){
     	return $this->hasMany('App\manga_chap_img','id','idChap');
     }
+
+	public function viewcount(){
+		return $this->hasMany('App\viewcount','idChap','id');
+	}
 }
