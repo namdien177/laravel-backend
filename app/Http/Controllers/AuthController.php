@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\author;
+use App\Http\Requests\SignupAuthor;
 use App\Http\Requests\SignupRequest;
 use App\User;
 use Illuminate\Http\Request;
@@ -36,15 +38,26 @@ class AuthController extends Controller
 		return $this->respondWithToken($token);
 	}
 
-	public function signupAuthor(SignupRequest $request)
+	public function signupAuthor(SignupAuthor $request)
 	{
-		$user = User::create($request->all());
-
+		$user = User::create($request->all(['name','email','password','authorize']));
+		$newauthor = new author;
+		$newauthor->name = $request->authorname;
+		$newauthor->information = $request->information;
+		$newauthor->idViewer = $user->id;
+		$newauthor->save();
 		return $this->login($request);
 	}
 
-	public function signupViewer(Request $request){
+	public function signupViewer(SignupRequest $request){
+		$user = User::create($request->all(['name','email','password','authorize']));
+		return $this->login($user);
+	}
 
+	public function signupUser(Request $request){
+//		return $request->all('name');
+		$user = User::create($request->all());
+		return $this->login($user);
 	}
 
 	/**

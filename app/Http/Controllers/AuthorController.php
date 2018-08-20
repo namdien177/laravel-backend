@@ -24,4 +24,9 @@ class AuthorController extends Controller
 //	    $listorder = $mangaList->manga_chaps->sortBy('created_at');
     	return MangaResource::collection($mangaList);
     }
+
+    public function show($id){
+    	$author = author::findOrFail($id);
+    	return new MangaResource($author);
+    }
 }

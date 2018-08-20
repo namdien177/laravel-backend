@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 ///////////////////Author API////////////////////////////////////////
 Route::get('author', 'AuthorController@index');
+Route::get('author/{id}', 'AuthorController@show');
 Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 
 //////////////////Manga API//////////////////////////////////////////
@@ -50,12 +51,14 @@ Route::group([
 
 ], function ($router) {
 
-	Route::post('login', 'AuthController@login');
-	Route::post('logout', 'AuthController@logout');
+	Route::post('login', [ 'as' => 'login', 'uses' => 'AuthController@login']);
+	Route::post('logout', [ 'as' => 'logout', 'uses' => 'AuthController@logout']);
 	Route::post('refresh', 'AuthController@refresh');
 	Route::post('me', 'AuthController@me');
 	Route::post('signupauthor','AuthController@signupAuthor');
 	Route::post('signupviewer','AuthController@signupViewer');
+//	Route::post('signup','AuthController@signup');
+
 });
 
 Route::get('/user/{id}/bookmark', 'UserController@showBookmark');    // get bookmark list
