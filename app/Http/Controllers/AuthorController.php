@@ -14,6 +14,19 @@ class AuthorController extends Controller
 	    return MangaResource::collection($author);
     }
 
+    public function validateUser(Request $request){
+    	$idUser = $request->input('id');
+    	$author = author::where('idViewer','=',$idUser)->count();
+    	if ($author > 0){
+    		return response()->json([
+    			'id' => author::where('idViewer','=',$idUser)->first()->id
+		    ]);
+	    }
+	    return response()->json([
+		    'id' => -1
+	    ]);
+    }
+
     public function indexRecentManga($id){
     	$mangaList = manga::whereHas('manga_author',function ($query) use ($id){
 		    $query->where('idAuthor','=',$id);

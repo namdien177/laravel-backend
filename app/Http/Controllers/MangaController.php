@@ -6,6 +6,8 @@ use App\author;
 use App\bookmark;
 use App\Http\Requests;
 use App\Http\Resources\MangaTags;
+use App\manga_alias;
+use App\manga_author;
 use App\User as UserDB;
 use App\manga;
 use App\Http\Resources\Manga as MangaResource;
@@ -28,7 +30,7 @@ class MangaController extends Controller
      */
     public function index()
     {
-	    $mangas = Manga::orderBy('name','asc')->paginate(10);
+	    $mangas = Manga::where('authorize','=','1')->orderBy('name','asc')->paginate(10);
 	    return MangaResource::collection($mangas);
     }
 
@@ -43,13 +45,6 @@ class MangaController extends Controller
 	    })->orderBy('chap','asc')->paginate(75);
     	return MangaResource::collection($chap);
     }
-
-//	public function indexChapAll($id){
-//		$chap = manga_chap::whereHas('manga',function ($query) use ($id){
-//			$query->where('id','=',$id);
-//		})->orderBy('chap','asc')->get();
-//		return MangaResource::collection($chap);
-//	}
 
 	/**
 	 * get author of the manga
@@ -149,17 +144,15 @@ class MangaController extends Controller
 	}
 
 	public function getHottestManga($number = 4){
-		$listManga = manga::withCount('viewcount')->orderBy('viewcount_count','desc')->paginate($number);
-//		$listManga = manga::with('viewcount')->paginate($number)->sortBy(function($manga){
-//			return $manga->viewcount->count();
-//		}, SORT_REGULAR, true );
+		$listManga = manga::withCount('viewcount')->where('authorize','=','1')
+			->orderBy('viewcount_count','desc')->paginate($number);
 		return MangaResource::collection($listManga);
 	}
 
 	public function getHottestMangaAuthor($number = 4, $id){
 		$listManga = manga::whereHas('manga_author', function ($query) use ($id){
 			$query->where('idAuthor','=',$id);
-		})->withCount('viewcount')->orderBy('viewcount_count','desc')->paginate($number);
+		})->withCount('viewcount')->where('authorize','=','1')->orderBy('viewcount_count','desc')->paginate($number);
 		return MangaResource::collection($listManga);
 	}
 
@@ -293,7 +286,7 @@ class MangaController extends Controller
 	public function getUpdateManga($number){
     	$listManga = manga::whereHas('manga_chap', function ($query) {
     		$query->orderBy('updated_at','asc');
-	    })->paginate($number);
+	    })->where('authorize','=','1')->paginate($number);
     	return MangaResource::collection($listManga);
 	}
 
@@ -315,7 +308,82 @@ class MangaController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->all();
+    	$tagList= $request->input('tags');
+    	$aliasnameList=$request->input('aliasName');
+    	$authorIDasViewer=$request->input('author');
+    	$authorID = author::whereHas('User', function ($query) use ($authorIDasViewer){
+		    $query->where('id','=',$authorIDasViewer);
+	    })->first()->id;
+    	$countOnServer = manga::where('name','like','%'. $request->input('name').'%')->count();
+    	if ($countOnServer >0){
+    		$manga = new manga;
+		    $manga->name = $request->input('name');
+		    $manga->cover = $request->input('cover');
+		    $manga->description = $request->input('description');
+		    $manga->metaURL = $request->input('metaURL');
+		    $manga->releaseYear = $request->input('releaseYear');
+		    $manga->status = $request->input('status');
+    		$manga->authorize = -1;                 //need caution to review as it is duplicated
+		    $manga->save();
+		    //  to manga_tags table
+		    foreach ($tagList as $tag){
+			    $newtag = new manga_tags;
+			    $newtag->idManga = $manga->id;
+			    $newtag->idTag = $tag['id'];
+			    $newtag->save();
+		    }
+		    //  to manga_alias table
+		    foreach ($aliasnameList as $name){
+			    $alias = new manga_alias;
+			    $alias->idManga = $manga->id;
+			    $alias->name = $name;
+			    $alias->save();
+		    }
+		    //  to manga_author table
+		    $authorLink = new manga_author;
+		    $authorLink->idManga = $manga->id;
+		    $authorLink->idAuthor = $authorID;
+		    $authorLink->save();
+		    return Response()->json([
+			    'boolean' => true,
+			    'message' => 'Your manga is now on the server, but it still won\'t showing up as we have to do some checkup for that. 
+			    You know, because your manga is too awesome that we have to make sure it in its awesome-state when showing to everyone!'
+		    ]);
+	    }else{
+		    $manga = new manga;
+		    $manga->name = $request->input('name');
+		    $manga->cover = $request->input('cover');
+		    $manga->description = $request->input('description');
+		    $manga->metaURL = $request->input('metaURL');
+		    $manga->releaseYear = $request->input('releaseYear');
+		    $manga->status = $request->input('status');
+		    $manga->authorize = 0;                 //need to authorized
+		    $manga->save();
+		    //  to manga_tags table
+		    foreach ($tagList as $tag){
+			    $newtag = new manga_tags;
+			    $newtag->idManga = $manga->id;
+			    $newtag->idTag = $tag['id'];
+			    $newtag->save();
+		    }
+		    //  to manga_alias table
+		    foreach ($aliasnameList as $name){
+			    $alias = new manga_alias;
+			    $alias->idManga = $manga->id;
+			    $alias->name = $name;
+			    $alias->save();
+		    }
+		    //  to manga_author table
+		    $authorLink = new manga_author;
+		    $authorLink->idManga = $manga->id;
+		    $authorLink->idAuthor = $authorID;
+		    $authorLink->save();
+		    return Response()->json([
+			    'boolean' => true,
+			    'message' => 'Your manga is now on the server, but it still won\'t showing up now but we will soon approve it 
+			     ASAP for the world to read your awesome manga!'
+		    ]);
+	    }
     }
 
     /**
@@ -326,7 +394,7 @@ class MangaController extends Controller
      */
     public function show($id)
     {
-        $manga = manga::findOrFail($id);
+        $manga = manga::where('authorize','=','1')->where('id','=', $id)->first();
         return new MangaResource($manga);
     }
 

@@ -19,13 +19,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 ///////////////////Author API////////////////////////////////////////
 Route::get('author', 'AuthorController@index');
+Route::post('author','AuthorController@validateUser');
 Route::get('author/{id}', 'AuthorController@show');
 Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 
 //////////////////Manga API//////////////////////////////////////////
 Route::get('manga','MangaController@index');        // Display all
 Route::get('manga/updatelist/{number}', 'MangaController@getupdatemanga');
-Route::post('manga/upload', 'MangaController@store') ;   // upload new manga
 Route::get('manga/hottest/{number}','MangaController@getHottestManga');
 Route::get('manga/hottest/{number}/author/{id}','MangaController@getHottestMangaAuthor');
 
@@ -49,6 +49,7 @@ Route::get('manga/{id}/unread/{idUser}','MangaController@markunRead');
 Route::get('tags/search','TagsController@searchString');
 Route::get('tags/{id}','TagsController@show');        // Display tags
 
+Route::post('content/upload', 'MangaController@store') ;   // upload new manga
 /////////////////////////LOGIN API////////////////////////////////////
 Route::group([
 

@@ -12,7 +12,7 @@ class author extends Model
     	return $this->hasMany('App\manga_author','idAuthor','id');
     }
 
-    public function user(){
-    	return $this->hasOne('App\User','idViewer','id');
+    public function User(){
+    	return $this->hasOne('App\User','id','idViewer');
     }
 }

@@ -54,7 +54,7 @@ class User extends Authenticatable implements JWTSubject
 	}
 
 	public function author(){
-		return $this->hasOne('App\author','id','idViewer');
+		return $this->hasOne('App\author','idViewer','id');
 	}
 
 	public function bookmark(){
