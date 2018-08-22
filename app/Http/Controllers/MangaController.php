@@ -63,31 +63,28 @@ class MangaController extends Controller
     	return MangaResource::collection($author);
 	}
 
-	public function addCountView($id, $idChap, $idViewer){
-		$ipUser = \Request::ip();
+	function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+	{
+		$pieces = [];
+		$max = mb_strlen($keyspace, '8bit') - 1;
+		for ($i = 0; $i < $length; ++$i) {
+			$pieces []= $keyspace[random_int(0, $max)];
+		}
+		return implode('', $pieces);
+	}
+
+	public function addCountView($id, $idChap, $idViewer, Request $request){
+		$ipUser = $request->tokenView ."";
 		if ($idViewer ==6 ){
 			$onserver = viewcount::where('idManga','=',$id)->where('idViewer','=',$idViewer)
-				->where('idChap','=',$idChap)->count();
-			if ($onserver > 0){
-				$view = viewcount::where('idManga','=',$id)->where('idViewer','=',$idViewer)
-					->where('idChap','=',$idChap)->first();
-				if ($view->IPUser != $ipUser){
-					$anonymous = new viewcount;
-					$anonymous->idManga = $id;
-					$anonymous->idViewer = $idViewer;
-					$anonymous->idChap = $idChap;
-					$anonymous->IPUser = $ipUser;
-					$anonymous->save();
-					return response()->json([
-						'boolean'=>true,
-						'message'=>'The view was counted for guess with IP: '.$ipUser,
-					]);
-				}
+				->where('idChap','=',$idChap)->where('IPUser','=',$ipUser)->count();
+			if ($onserver > 0 && strlen($ipUser)==40 ){
 				return response()->json([
 					'boolean'=>false,
-					'message'=>'The view was not counted for guess with IP: '.$ipUser,
+					'message'=>'The view was not counted for guess with Token: '.$ipUser,
 				]);
-			}else{
+			}else if ($onserver ==0  && strlen($ipUser)==40 ){
+				$randToken = $this->random_str(40);
 				$anonymous = new viewcount;
 				$anonymous->idManga = $id;
 				$anonymous->idViewer = $idViewer;
@@ -96,7 +93,26 @@ class MangaController extends Controller
 				$anonymous->save();
 				return response()->json([
 					'boolean'=>true,
-					'message'=>'The view was counted for guess with IP: '.$ipUser,
+					'message'=>'The view was counted for guess with Token - '.$ipUser,
+					'tokenView'=> $ipUser
+				]);
+			}else if ($onserver ==0  && strlen($ipUser) == 0 ){
+				$randToken = $this->random_str(40);
+				$anonymous = new viewcount;
+				$anonymous->idManga = $id;
+				$anonymous->idViewer = $idViewer;
+				$anonymous->idChap = $idChap;
+				$anonymous->IPUser = $randToken;
+				$anonymous->save();
+				return response()->json([
+					'boolean'=>true,
+					'message'=>'The view was counted for new guess',
+					'tokenView'=> $randToken
+				]);
+			}else{
+				return response()->json([
+					'boolean'=>false,
+					'message'=>'Invalid entry - No token found or token not qualified',
 				]);
 			}
 		}else{
@@ -112,12 +128,13 @@ class MangaController extends Controller
 				return response()->json([
 					'boolean'=>true,
 					'message'=>'The view was counted for user ID:'.$idViewer." - With IP: ".$ipUser,
+					'tokenView'=>$this->random_str(40)
 				]);
 			}
 		}
 		return response()->json([
 			'boolean'=>false,
-			'message'=>'The view was not counted for guess with IP: '.$ipUser,
+			'message'=>'The view was not counted for guess with Token: '.$ipUser,
 		]);
 	}
 
@@ -298,7 +315,7 @@ class MangaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $request->all();
     }
 
     /**

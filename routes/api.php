@@ -36,7 +36,7 @@ Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display 75 chap o
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 Route::get('manga/{id}/chap/{idChap}/link', 'MangaController@getmorelinkChap');
 Route::get('manga/{id}/chap/{idChap}/count/getcount', 'MangaController@getViewCount');
-Route::get('manga/{id}/chap/{idChap}/count/{idViewer}', 'MangaController@addCountView');
+Route::post('manga/{id}/chap/{idChap}/count/{idViewer}', 'MangaController@addCountView');
 
 Route::get('manga/{id}/tags','MangaController@showTags');        // Display tags
 
@@ -46,7 +46,9 @@ Route::get('manga/{id}/unbookmark/{idUser}', 'MangaController@unbookmarkManga');
 Route::get('manga/{id}/read/{idUser}','MangaController@markRead');
 Route::get('manga/{id}/unread/{idUser}','MangaController@markunRead');
 
+Route::get('tags/search','TagsController@searchString');
 Route::get('tags/{id}','TagsController@show');        // Display tags
+
 /////////////////////////LOGIN API////////////////////////////////////
 Route::group([
 
