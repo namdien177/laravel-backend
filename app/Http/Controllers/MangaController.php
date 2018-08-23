@@ -19,6 +19,8 @@ use App\tags;
 use App\User;
 use App\viewcount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use Tymon\JWTAuth\Contracts\Providers\Auth;
 
 class MangaController extends Controller
@@ -396,6 +398,18 @@ class MangaController extends Controller
     {
         $manga = manga::where('authorize','=','1')->where('id','=', $id)->first();
         return new MangaResource($manga);
+    }
+
+    public function showName()
+    {
+    	$searchString = Input::get('name');
+    	$searchStringNumber = Input::get('result');
+    	if ($searchStringNumber == null){
+		    $listmanga = manga::where('name','like','%'.$searchString.'%')->orderBy('name','asc')->paginate(3);
+		    return MangaResource::collection($listmanga);
+	    }
+	    $listmanga = manga::where('name','like','%'.$searchString.'%')->orderBy('name','asc')->paginate($searchStringNumber);
+    	return MangaResource::collection($listmanga);
     }
 
 	public function showTags($id)

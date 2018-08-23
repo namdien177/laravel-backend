@@ -25,6 +25,7 @@ Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 
 //////////////////Manga API//////////////////////////////////////////
 Route::get('manga','MangaController@index');        // Display all
+Route::get('search', 'MangaController@showName');
 Route::get('manga/updatelist/{number}', 'MangaController@getupdatemanga');
 Route::get('manga/hottest/{number}','MangaController@getHottestManga');
 Route::get('manga/hottest/{number}/author/{id}','MangaController@getHottestMangaAuthor');
