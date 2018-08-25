@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 ///////////////////Author API////////////////////////////////////////
 Route::get('author', 'AuthorController@index');
 Route::post('author','AuthorController@validateUser');
+Route::post('author/manga','AuthorController@authorizeManga');
 Route::get('author/{id}', 'AuthorController@show');
 Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 

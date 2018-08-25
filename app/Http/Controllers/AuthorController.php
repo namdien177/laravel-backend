@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\author;
 use App\Http\Resources\Manga as MangaResource;
 use App\manga;
+use App\User;
 use Illuminate\Http\Request;
 
 class AuthorController extends Controller
@@ -27,14 +28,36 @@ class AuthorController extends Controller
 	    ]);
     }
 
+    public function authorizeManga(Request $request){
+    	$idUser = $request->input('idUser');
+    	$author = User::find($idUser)->author;
+    	if ($author == null)
+    		return response()->json([
+		    'boolean'=>false,
+		    'message'=>'User is not an author',
+	    ]);
+    	$idAuthor = $author->id;
+    	$idManga = $request->input('idManga');
+    	$checkcount = manga::whereHas('manga_author', function ($query) use ($idAuthor){
+    		$query->where('idAuthor','=', $idAuthor);
+	    })->where('id','=',$idManga)->count();
+    	if ($checkcount >0){
+		    return response()->json([
+			    'boolean'=>true,
+			    'message'=>'This manga belongs to current logged user',
+		    ]);
+	    }else{
+		    return response()->json([
+			    'boolean'=>false,
+			    'message'=>'The manga is not owned by current logged user',
+		    ]);
+	    }
+    }
+
     public function indexRecentManga($id){
     	$mangaList = manga::whereHas('manga_author',function ($query) use ($id){
 		    $query->where('idAuthor','=',$id);
 	    })->orderBy('created_at')->paginate(4);
-//	    $mangaList = manga::whereHas('manga_author',function ($query) use ($id){
-//		    $query->where('idAuthor','=',$id);
-//	   })->get();
-//	    $listorder = $mangaList->manga_chaps->sortBy('created_at');
     	return MangaResource::collection($mangaList);
     }
 

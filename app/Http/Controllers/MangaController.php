@@ -404,11 +404,22 @@ class MangaController extends Controller
     {
     	$searchString = Input::get('name');
     	$searchStringNumber = Input::get('result');
-    	if ($searchStringNumber == null){
-		    $listmanga = manga::where('name','like','%'.$searchString.'%')->orderBy('name','asc')->paginate(3);
+    	$nameOrder = Input::get('order');
+    	$condition = Input::get('condi');
+	    if ($condition != '1' && $condition !='2' && $condition != '0') return null;
+    	if ($nameOrder != 'asc' && $nameOrder !='desc') return null;
+    	if ($condition == '0'){
+		    $listmanga = manga::where('name','like','%'.$searchString.'%')
+			    ->orderBy('name',$nameOrder)->paginate($searchStringNumber);
 		    return MangaResource::collection($listmanga);
 	    }
-	    $listmanga = manga::where('name','like','%'.$searchString.'%')->orderBy('name','asc')->paginate($searchStringNumber);
+    	if ($searchStringNumber == null){
+		    $listmanga = manga::where('name','like','%'.$searchString.'%')->where('status','=',$condition)
+			    ->orderBy('name',$nameOrder)->paginate(3);
+		    return MangaResource::collection($listmanga);
+	    }
+	    $listmanga = manga::where('name','like','%'.$searchString.'%')->where('status','=',$condition)
+		    ->orderBy('name',$nameOrder)->paginate($searchStringNumber);
     	return MangaResource::collection($listmanga);
     }
 

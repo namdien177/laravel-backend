@@ -13,6 +13,6 @@ class author extends Model
     }
 
     public function User(){
-    	return $this->hasOne('App\User','id','idViewer');
+    	return $this->belongsTo('App\User','idViewer', 'id');
     }
 }
