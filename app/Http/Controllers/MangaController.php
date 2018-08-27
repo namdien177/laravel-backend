@@ -18,6 +18,7 @@ use App\manga_tags;
 use App\tags;
 use App\User;
 use App\viewcount;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
@@ -133,6 +134,11 @@ class MangaController extends Controller
 			'boolean'=>false,
 			'message'=>'The view was not counted for guess with Token: '.$ipUser,
 		]);
+	}
+
+	public function getAliasOf($id){
+		$alias = manga_alias::where('idManga','=',$id)->get();
+		return MangaResource::collection($alias);
 	}
 
 	public function getViewCount($id, $idChap){
@@ -388,6 +394,49 @@ class MangaController extends Controller
 	    }
     }
 
+    public function storeChap(Request $request){
+    	$idManga = $request->get('idManga');
+    	$chap = $request->get('chapNumber');
+	    $chapTitle = $request->get('chapTitle');
+	    $chapOmake = $request->get('chapNumberSecondary');
+	    $listImg = $request->get('listURL');
+
+	    if ($chapOmake !=null || $chapOmake ==0) $chap = $chap.'.'.$chapOmake;
+	    if (!is_array($listImg) && count($listImg)<1) return Response()->json([
+	    	'boolean'=>false,
+		    'message'=>'A chap cannot have empty content. Add some image to it first!'
+	    ]);
+
+	    if ($idManga == null) return Response()->json([
+		    'boolean'=>false,
+		    'message'=>'Cannot identify the manga that is going to be updated!'
+	    ]);
+
+	    $mangaChap = new manga_chap;
+	    $mangaChap->idManga = $idManga;
+	    $mangaChap->chap = $chap;
+	    $mangaChap->title = $chapTitle;
+	    $mangaChap->save();
+
+	    if ($mangaChap->id){
+	    	foreach ($listImg as $img){
+			    $imgManga = new manga_chap_img;
+			    $imgManga->idChap = $mangaChap->id;
+			    $imgManga->img_url = $img['src'];
+			    $imgManga->save();
+		    }
+		    return Response()->json([
+			    'boolean'=>true,
+			    'message'=>'You should check out for this newest chap now!'
+		    ]);
+	    }else{
+	    	return Response()->json([
+			    'boolean'=>false,
+			    'message'=>'Cannot update on this manga, Please try again!'
+		    ]);
+	    }
+    }
+
     /**
      * Display the specified resource.
      *
@@ -439,16 +488,28 @@ class MangaController extends Controller
 	}
 
 	public function getmorelinkChap($id, $chap){
-    	$prev = manga_chap::where('idManga', '=', $id)->where('chap', '=', $chap-1)->first();
-		$next = manga_chap::where('idManga', '=', $id)->where('chap', '=', $chap+1)->first();
+     	$current = manga_chap::where('idManga', '=', $id)->where('id', $chap)->first();
+    	$chapN = $current->chap;
+//		return $chapN -1;
+    	$prev = manga_chap::where('idManga', '=', $id)->whereBetween('chap', [$chapN -1, $chapN])->get();
+		$next = manga_chap::where('idManga', '=', $id)->whereBetween('chap', [$chapN, $chapN +1])->get();
 		$linkPrev = null;
 		$linkNext = null;
-		if ($prev) {
-			$linkPrev = 'manga/'.$id.'/chap/'.$prev->chap;
+
+		try{
+			$linkPrev = 'manga/'.$id.'/chap/'.$prev[count($prev)-2]->id;
+		}catch (Exception $e){
+			$linkPrev = null;
 		}
-		if ($next){
-			$linkNext = 'manga/'.$id.'/chap/'.$next->chap;
+
+
+		try{
+			$chapnext = $next[1];
+			$linkNext = 'manga/'.$id.'/chap/'.$chapnext->id;
+		}catch (Exception $e){
+			$linkNext = null;
 		}
+
 		return response()->json([
 			'prev'=> $linkPrev,
 			'next'=> $linkNext,
@@ -473,9 +534,59 @@ class MangaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $idManga = $request->get('idManga');
+        $cover = $request->get('cover');
+        $description = $request->get('description');
+        $status = $request->get('status');
+
+        $tagremove = $request->get('tagRemove');
+	    $tagadd = $request->get('tagAdd');
+	    $aliasremove = $request->get('aliasRemove');
+	    $aliasadd= $request->get('aliasAdd');
+
+	    //change manga
+	    $manga = manga::where('id','=', $idManga)->first();
+	    if ($cover != null && strlen($cover)>3 && $cover != $manga->cover ) $manga->cover = $cover;
+	    if ($description != null && strlen($description)>3 && $description != $manga->description) $manga->description = $description;
+	    if ($status != null && is_numeric($status) && ($status == 1 || $status == 2 || $status == 3))
+	    	$manga->status = $status;
+		$manga->save();
+
+		if ($tagremove != null && is_array($tagremove) && count($tagremove) > 0){
+			foreach ($tagremove as $tag) {
+				$onDB = manga_tags::where('idManga','=', $idManga)->where('idTag','=',$tag['id'])->first();
+				$onDB->delete();
+			}
+		}
+		if ($tagadd != null && is_array($tagadd) && count($tagadd) > 0){
+			foreach ($tagadd as $tag) {
+				$tagnew = new manga_tags;
+				$tagnew->idManga = $idManga;
+				$tagnew->idTag = $tag['id'];
+				$tagnew->save();
+			}
+		}
+		if ($aliasremove != null && is_array($aliasremove) && count($aliasremove) > 0){
+			foreach ($aliasremove as $alias) {
+				$onDB = manga_alias::where('idManga','=', $idManga)->where('name','=',$alias)->first();
+				$onDB->delete();
+			}
+		}
+		if ($aliasadd != null && is_array($aliasadd) && count($aliasadd) > 0){
+			foreach ($aliasadd as $alias) {
+				$aliasnew = new manga_alias;
+				$aliasnew->idManga = $idManga;
+				$aliasnew->name = $alias;
+				$aliasnew->save();
+			}
+		}
+
+		return Response()->json([
+			'boolean'=>true,
+			'message'=>'Manga with ID: '.$idManga.' - was updated!'
+		]);
     }
 
     /**

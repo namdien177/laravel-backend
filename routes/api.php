@@ -34,6 +34,7 @@ Route::get('manga/hottest/{number}/author/{id}','MangaController@getHottestManga
 Route::get('manga/{id}','MangaController@show');        // Display one
 Route::get('manga/{id}/getauthor', 'MangaController@indexAuthor');   // get author
 Route::get('manga/{id}/getview', 'MangaController@getViewCountAll'); // display total view
+Route::get('manga/{id}/aliases', 'MangaController@getAliasOf');
 Route::get('manga/{id}/chap', 'MangaController@indexChap'); // display 75 chap of manga
 Route::get('manga/{id}/chap/{idChap}', 'MangaController@showChap');
 Route::get('manga/{id}/chap/{idChap}/link', 'MangaController@getmorelinkChap');
@@ -52,6 +53,8 @@ Route::get('tags/search','TagsController@searchString');
 Route::get('tags/{id}','TagsController@show');        // Display tags
 
 Route::post('content/upload', 'MangaController@store') ;   // upload new manga
+Route::post('content/updateChap', 'MangaController@storeChap'); //upload new chat
+Route::post('content/updateManga', 'MangaController@update'); //upload new chat
 /////////////////////////LOGIN API////////////////////////////////////
 Route::group([
 
