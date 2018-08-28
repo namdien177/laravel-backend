@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\author;
 use App\bookmark;
+use App\manga;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResources;
@@ -39,15 +41,53 @@ class UserController extends Controller
 	    ]);
     }
 
-//	function generateRandomString($length = 10) {
-//		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//		$charactersLength = strlen($characters);
-//		$randomString = '';
-//		for ($i = 0; $i < $length; $i++) {
-//			$randomString .= $characters[rand(0, $charactersLength - 1)];
-//		}
-//		return $randomString;
-//	}
+    public function getAuthorizeManga(Request $request){
+    	$isAdmin = User::where('id','=',$request->get('id'))->where('authorize','=',-1)->count();
+    	if ($isAdmin ==1){
+		    $listMangaUnauthorized = manga::where('authorize','=', 0)->paginate(3);
+		    return MangaResource::collection($listMangaUnauthorized);
+	    }else{
+    		return null;
+	    }
+    }
+
+    public function authorizeManga(Request $request){
+	    $isAdmin = User::where('id','=',$request->get('id'))->where('authorize','=',-1)->count();
+	    if ($isAdmin == 1){
+	    	$idManga = $request->get('idManga');
+	    	if ($idManga != null){
+	    		$manga = manga::where('id','=',$idManga)->where('authorize','=',0)->first();
+	    		if ($manga != null){
+	    			$manga->authorize = 1;
+				    $manga->save();
+				    return response()->json([
+					    'boolean'=> true,
+					    'message'=> 'Authorize for manga is completed.'
+				    ]);
+			    }
+		    }
+	    }
+	    return response()->json([
+	    	'boolean'=> false,
+		    'message'=> 'Authorize failed.'
+	    ]);
+    }
+
+    public function getStatsUser(Request $request){
+	    $isAdmin = User::where('id','=',$request->get('id'))->where('authorize','=',-1)->count();
+	    if ($isAdmin == 1){
+		    $total = User::where('authorize','=',1)->count();
+		    $author = author::wherehas('User', function ($query) {
+			    $query->where('authorize','=', 1);
+		    })->count();
+		    return response()->json([
+			    'total'=> $total,
+			    'author'=> $author,
+		    ]);
+	    }else{
+	    	return null;
+	    }
+    }
 
     /**
      * Store a newly created resource in storage.

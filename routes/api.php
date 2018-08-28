@@ -28,7 +28,7 @@ Route::get('author/{id}/recent-update', 'AuthorController@indexRecentManga' );
 Route::get('manga','MangaController@index');        // Display all
 Route::get('search', 'MangaController@showName');
 Route::get('manga/updatelist/{number}', 'MangaController@getupdatemanga');
-Route::get('manga/hottest/{number}','MangaController@getHottestManga');
+Route::get('manga/hottest/{number}','MangaController@getHottestManga');                     //////report
 Route::get('manga/hottest/{number}/author/{id}','MangaController@getHottestMangaAuthor');
 
 Route::get('manga/{id}','MangaController@show');        // Display one
@@ -55,6 +55,10 @@ Route::get('tags/{id}','TagsController@show');        // Display tags
 Route::post('content/upload', 'MangaController@store') ;   // upload new manga
 Route::post('content/updateChap', 'MangaController@storeChap'); //upload new chat
 Route::post('content/updateManga', 'MangaController@update'); //upload new chat
+
+Route::post('admin/newManga', 'UserController@getAuthorizeManga');
+Route::post('admin/authorizeManga','UserController@authorizeManga');
+Route::post('admin/statsuser','UserController@getStatsUser');
 /////////////////////////LOGIN API////////////////////////////////////
 Route::group([
 
@@ -69,7 +73,6 @@ Route::group([
 	Route::post('me', 'AuthController@me');
 	Route::post('signupauthor','AuthController@signupAuthor');
 	Route::post('signupviewer','AuthController@signupViewer');
-//	Route::post('signup','AuthController@signup');
 
 });
 
