@@ -293,8 +293,8 @@ class MangaController extends Controller
 	 */
 	public function getUpdateManga($number){
     	$listManga = manga::whereHas('manga_chap', function ($query) {
-    		$query->orderBy('updated_at','asc');
-	    })->where('authorize','=','1')->paginate($number);
+    		$query->orderBy('updated_at','desc');
+	    })->where('authorize','=','1')->orderBy('created_at','desc')->paginate($number);
     	return MangaResource::collection($listManga);
 	}
 
